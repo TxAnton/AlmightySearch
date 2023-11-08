@@ -1,2 +1,4 @@
 openai~=1.1.1
 stc-geck
+
+parrot~=0.0.16
