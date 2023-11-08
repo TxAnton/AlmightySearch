@@ -1,2 +1,3 @@
 openai~=1.1.1
 stc-geck
+pandas
