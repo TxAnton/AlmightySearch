@@ -19,7 +19,7 @@ from stc_geck.client import StcGeck
 
 #%%
 
-async def _geck_search(prompt: str ="additive manufacturing", limit: int=10, ipfs_url='http://127.0.0.1:8080'):
+async def _geck_search(prompt: str, limit: int=10, ipfs_url='http://127.0.0.1:8080'):
     geck = StcGeck(
         ipfs_http_base_url=ipfs_url,
         timeout=300,
@@ -56,7 +56,7 @@ async def _geck_search(prompt: str ="additive manufacturing", limit: int=10, ipf
     
     
 #%%
-def geck_search(prompt: str ="additive manufacturing", limit: int=10, ipfs_url='http://127.0.0.1:8080'):
+def geck_search(prompt: str ="additive manufacturing", limit: int=5, ipfs_url='http://127.0.0.1:8080'):
     res = asyncio.run(_geck_search(prompt, limit, ipfs_url))
     # ['abstract',
     #  'authors',
