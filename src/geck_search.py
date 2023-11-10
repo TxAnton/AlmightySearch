@@ -5,18 +5,10 @@
 
 import argparse
 import asyncio
-
-#%%
 from datetime import datetime
 import pandas as pd
-
-#%%
 from stc_geck.advices import format_document
 from stc_geck.client import StcGeck
-#%%
-
-# DEFAULT_LIMIT = 5
-
 #%%
 
 async def _geck_search(prompt: str, limit: int=10, ipfs_url='http://127.0.0.1:8080'):
@@ -34,7 +26,7 @@ async def _geck_search(prompt: str, limit: int=10, ipfs_url='http://127.0.0.1:80
     # but details are hidden behind `SummaClient` interface.
     summa_client = geck.get_summa_client()
 
-    # Match search returns top-5 documents which contain `additive manufacturing` in their title, abstract or content.
+    # Match search returns top-`limit` documents which contain `prompt` in their title, abstract or content.
     documents = await summa_client.search_documents({
         "index_alias": "nexus_science",
         "query": {
@@ -58,6 +50,7 @@ async def _geck_search(prompt: str, limit: int=10, ipfs_url='http://127.0.0.1:80
 #%%
 def geck_search(prompt: str ="additive manufacturing", limit: int=5, ipfs_url='http://127.0.0.1:8080'):
     res = asyncio.run(_geck_search(prompt, limit, ipfs_url))
+    # Returned fields
     # ['abstract',
     #  'authors',
     #  'content',
@@ -76,9 +69,9 @@ def geck_search(prompt: str ="additive manufacturing", limit: int=5, ipfs_url='h
 
     obs = []
     for doc in res: # doc = res[0]
-        abstract = doc["abstract"] # clean from xml
+        abstract = doc["abstract"] # clean xml
         authors = []
-        for author in doc['authors']: # author = doc['authors'][0]
+        for author in doc['authors']:
 
             given = author.get("given")
             if type(given) == list:
@@ -89,7 +82,7 @@ def geck_search(prompt: str ="additive manufacturing", limit: int=5, ipfs_url='h
                 family = family[0]
             family = str(family)
 
-            authors.append(str(given+" "+family))  # authors.append(f"{author["given"]} {author["family"]}")
+            authors.append(str(given+" "+family))
 
         content = doc["content"] # clean xml
         # doc["ctr"] # drop
@@ -108,18 +101,12 @@ def geck_search(prompt: str ="additive manufacturing", limit: int=5, ipfs_url='h
         issued_at = datetime.fromtimestamp(doc["issued_at"])
         
         # updated_at = doc["updated_at"] #drop
-        ob = [abstract, authors, content, doi, issued_at,language, links, publisher, references, title, _type]
+        ob = [abstract, authors, content, doi, issued_at, language, links, publisher, references, title, _type]
         obs.append(ob)
 
     cols = ["abstract", "authors", "content", "doi", "issued_at", "language", "links", "publisher", "references", "title", "type"]
     df = pd.DataFrame(obs, columns=cols)
     return df
-#%%
-df = geck_search(prompt = "Ontology learning")
-
-#%%
-
-df
 
 
 #%%
